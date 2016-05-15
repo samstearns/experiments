@@ -1,6 +1,8 @@
+# hierarchical clustering of the dow jones stocks
 library(quantmod)
 
-# http://money.cnn.com/data/dow30/
+# load daily pricing data
+# From: http://money.cnn.com/data/dow30/
 dow.tickers <- c("MMM", "AXP", "AAPL", "BA", "CAT", 
                  "CVX", "CSCO", "KO", "DIS", "DD", 
                  "XOM", "GE", "GS", "HD", "IBM", 
@@ -8,7 +10,6 @@ dow.tickers <- c("MMM", "AXP", "AAPL", "BA", "CAT",
                  "MSFT", "NKE","PFE","PG", "TRV", 
                  "UTX", "UNH", "VZ", "V", "WMT")
 
-# load daily pricing data and store it in a dataframe
 getSymbols(dow.tickers)
 
 # load daily returns for 2015 in a dataframe
@@ -21,8 +22,9 @@ for (i in 1:length(dow.tickers)) {
 }
 
 # The distance matrix determines similarity between rows. 
-# Transpose the values which are store in a column per ticker
+# Transpose the values which are stored in a column per ticker
 dist.matrix.input <- t(as.matrix(returns))
-clust.complete <- hclust(dist(dist.matrix.input), method="complete")
 
+# run clustering and plot results
+clust.complete <- hclust(dist(dist.matrix.input), method="complete")
 plot(clust.complete, main="Complete Linkage")
