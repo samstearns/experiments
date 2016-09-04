@@ -11,15 +11,15 @@ aco <-read.csv("./Final.ACO.SSP.PUF.Y2013.csv")
 # This function sets up turnip charts with standard formatting. Following links have references
 # http://stackoverflow.com/questions/5106782/use-of-ggplot-within-another-function-in-r
 # http://stackoverflow.com/questions/15458526/r-pass-variable-column-indices-to-ggplot2
-drawTurnipGraph <- function(input.data,  y_string, title) {
-  ggplot(aco, aes_string(x = "1", y = y_string)) +
+drawTurnipGraph <- function(input.data,  y_string, title, y_axis_title) {
+  ggplot(input.data, aes_string(x = "1", y = y_string)) +
     geom_dotplot(binaxis = "y", stackdir = "center", dotsize=0.75) + 
     ggtitle(title) + 
     theme(plot.title = element_text(lineheight=.8, face="bold")) + 
-    labs(y = "Rate per 1,000") + 
+    labs(y = y_axis_title) + 
     theme(axis.text.x = element_blank())
 }
 
 # Example outputs
-drawTurnipGraph(aco, "P_SNF_ADM", "SNF Utilization by ACO, \n2013 Performance Year")
-drawTurnipGraph(aco, "ADM_S_Trm", "Short Term Inpatient Utilization by ACO, \n2013 Performance Year")
+drawTurnipGraph(aco, "P_SNF_ADM", "SNF Utilization by ACO, \n2013 Performance Year", "Rate per 1,000")
+drawTurnipGraph(aco, "ADM_S_Trm", "Short Term Inpatient Utilization by ACO, \n2013 Performance Year", "Rate per 1,000")
