@@ -8,13 +8,14 @@ library(ggplot2)
 setwd("/Users/sjs/Dropbox/dev/git/experiments/sp500returns/")
 sp <-read.csv("./sp500.csv")
 
-# Helper function to calculate CAGRs
 CalculateCAGR <- function(end, start, years) {
+  # Helper function to calculate CAGRs
+  
   return ((end / start) ** (1 / years) - 1.0)
 }
 
-# Helper function to calculate CAGRs
 CalculateRollingReturns <- function(start, end, lookback) {
+  # Helper function to calculate rolling retuns
   
   annual.returns <-c()
   for (i in start:end) {
@@ -35,7 +36,8 @@ result.frame[["20 Year"]] <- CalculateRollingReturns(31,89, 20)
 result.frame[["30 Year"]] <- CalculateRollingReturns(31,89, 30)
 
 # GG Plot
-ggplot2(result.frame) + geom_boxplot()
+p <- ggplot(result.frame) 
+p + geom_boxplot() + coord_flip()
 
 # Standard plot
 boxplot(result.frame, horizontal = TRUE)
