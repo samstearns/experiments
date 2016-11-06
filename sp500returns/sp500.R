@@ -22,8 +22,9 @@ CalculateRollingReturns <- function(start, end, lookback) {
 }
 
 # Calculate Rolling returns
-result.frame = as.data.frame(matrix(ncol=6, nrow=58))
-names(result.frame) = c("One Year", "3 Year", "5 Year", "10 Year", "20 Year", "30 Year")
+result.frame = as.data.frame(matrix(ncol=7, nrow=58))
+names(result.frame) = c("Year", "One Year", "3 Year", "5 Year", "10 Year", "20 Year", "30 Year")
+result.frame[["Year"]] <- sp[32:89, 1]
 result.frame[["One Year"]] <- CalculateRollingReturns(31,89, 1)
 result.frame[["3 Year"]] <- CalculateRollingReturns(31,89, 3)
 result.frame[["5 Year"]] <- CalculateRollingReturns(31,89, 5)
@@ -32,10 +33,11 @@ result.frame[["20 Year"]] <- CalculateRollingReturns(31,89, 20)
 result.frame[["30 Year"]] <- CalculateRollingReturns(31,89, 30)
 
 # GG Plot. Use levels as factor to order the columns
-p <- ggplot(stack(result.frame), aes(x = factor(ind, levels = names(result.frame)), y = values))
-p + geom_boxplot() + labs(title = "S&P 500 Rolling Returns: 1959-2015\nDistribution of rolling returns, excluding dividends", x="", y="") + scale_y_continuous(labels = percent)
+result.frame.excl.year <- result.frame[, 2:7]
+p <- ggplot(stack(result.frame.excl.year), aes(x = factor(ind, levels = names(result.frame)), y = values))
+p + geom_boxplot() + labs(title = "S&P 500 Rolling Returns: 1958-2015\nDistribution of rolling returns, excluding dividends", x="", y="") + scale_y_continuous(labels = percent)
 
-# Plot returns over time
+# Plot returns over time. Show 
 # http://docs.ggplot2.org/0.9.3.1/geom_line.html
 q <- ggplot(stack(result.frame), aes(x = factor(ind, levels = names(result.frame)), y = values))
 q + geom_line();
