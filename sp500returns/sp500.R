@@ -1,10 +1,14 @@
-# Create a boxplot of rolling returns for the S&P: 1, 5, 10, 20, 30 years
+
+# Load Libraries
 library(ggplot2)
 library(scales)
+library(reshape2)
 
+# Load data
 setwd("/Users/sjs/Dropbox/dev/git/experiments/sp500returns/")
 sp <-read.csv("./sp500.csv")
 
+# Helper functions to calculate rolling returns
 CalculateCAGR <- function(end, start, years) {
   # Helper function to calculate CAGRs
   return ((end / start) ** (1 / years) - 1.0)
@@ -32,14 +36,14 @@ result.frame[["10 Year"]] <- CalculateRollingReturns(31,89, 10)
 result.frame[["20 Year"]] <- CalculateRollingReturns(31,89, 20)
 result.frame[["30 Year"]] <- CalculateRollingReturns(31,89, 30)
 
-# GG Plot. Use levels as factor to order the columns
+# Create a boxplot of rolling returns for the S&P: 1, 5, 10, 20, 30 years
+# Use levels as factor to order the columns
 result.frame.excl.year <- result.frame[, 2:7]
 p <- ggplot(stack(result.frame.excl.year), aes(x = factor(ind, levels = names(result.frame)), y = values))
 p + geom_boxplot() + labs(title = "S&P 500 Rolling Returns: 1958-2015\nDistribution of rolling returns, excluding dividends", x="", y="") + scale_y_continuous(labels = percent)
 
-# Plot returns over time. Show 
-# http://docs.ggplot2.org/0.9.3.1/geom_line.html
-q <- ggplot(stack(result.frame), aes(x = factor(ind, levels = names(result.frame)), y = values))
-q + geom_line();
-# TODO: Use the shift function in the data.table library to simplify code
-# http://stackoverflow.com/questions/14689424/use-a-value-from-the-previous-row-in-an-r-data-table-calculation
+# Plot returns over time. Melt the dataset for input to geom_line chart
+dfdata <- melt(result.frame, id=c("Year"))
+colnames(dfdata) <- c("Year", "Period", "Return")
+r <- ggplot(dfdata, aes(x=Year, y=Return, group=Period)) 
+r + geom_line(aes(colour = Period)) + labs(title = "S&P 500 Rolling Returns: 1958-2015\nRolling returns, excluding dividends", x="", y="") + scale_y_continuous(labels = percent)
