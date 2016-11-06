@@ -7,7 +7,6 @@ sp <-read.csv("./sp500.csv")
 
 CalculateCAGR <- function(end, start, years) {
   # Helper function to calculate CAGRs
-  
   return ((end / start) ** (1 / years) - 1.0)
 }
 
@@ -32,14 +31,13 @@ result.frame[["10 Year"]] <- CalculateRollingReturns(31,89, 10)
 result.frame[["20 Year"]] <- CalculateRollingReturns(31,89, 20)
 result.frame[["30 Year"]] <- CalculateRollingReturns(31,89, 30)
 
-# Standard plot
-boxplot(result.frame, horizontal = TRUE)
-title(main = "S&P 500 Returns", sub = "Distribution of rolling returns, excluding dividends", xlab = "Annual Return")
-
 # GG Plot. Use levels as factor to order the columns
 p <- ggplot(stack(result.frame), aes(x = factor(ind, levels = names(result.frame)), y = values))
-p + geom_boxplot() + coord_flip() + labs(title = "S&P 500 Rolling Returns", x="", y="Annnual Return (Excluding dividends)")
-# TODO: Fix label formatting
+p + geom_boxplot() + labs(title = "S&P 500 Rolling Returns: 1959-2015\nDistribution of rolling returns, excluding dividends", x="", y="") + scale_y_continuous(labels = percent)
 
+# Plot returns over time
+# http://docs.ggplot2.org/0.9.3.1/geom_line.html
+q <- ggplot(stack(result.frame), aes(x = factor(ind, levels = names(result.frame)), y = values))
+q + geom_line();
 # TODO: Use the shift function in the data.table library to simplify code
 # http://stackoverflow.com/questions/14689424/use-a-value-from-the-previous-row-in-an-r-data-table-calculation
