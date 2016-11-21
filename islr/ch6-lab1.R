@@ -60,3 +60,89 @@ plot(regfit.full,scale="adjr2")
 plot(regfit.full,scale="Cp")
 plot(regfit.full,scale="bic")
 coef(regfit.full, 6)
+
+###############################################################################
+# 6.5.2 Forward and Backward Stepwise Selection
+###############################################################################
+
+# Use the regsubsets() function to perform forward stepwise or backward stepwise 
+# selection, using the argument method="forward" or method="backward".
+
+regfit.fwd = regsubsets( Salary ~ ., data = Hitters, nvmax=19, method = "forward")
+summary(regfit.fwd)
+regfit.bwd = regsubsets( Salary ~ ., data = Hitters, nvmax=19, method = "backward")
+summary(regfit.bwd)
+
+###############################################################################
+# Choosing Among Models Using the Validation Set Approach and Cross-Validation
+###############################################################################
+
+# Create training and test set
+set.seed (1)
+train = sample(c(TRUE,FALSE), nrow(Hitters), rep=TRUE)
+test =(!train)
+
+# Perform best subset selection on the training dataset
+regfit.best = regsubsets( Salary ~ ., data = Hitters[train,], nvmax=19)
+
+# Compute the validation set error for the best model of each model size. 
+# First make a model matrix from the test data.
+test.mat = model.matrix(Salary ~ ., data=Hitters[test,])
+
+val.errors = rep(NA, 19)
+for(i in 1:19) {
+  # Extract the coefficients from regfit.best for the best model of that size
+  coefi = coef(regfit.best, id = i)
+  # Multiply coefficients into the appropriate columns of the test model matrix to form the predictions
+  pred = test.mat[, names(coefi)] %*% coefi
+  # Compute the test MSE
+  val.errors[i] = mean((Hitters$Salary[test] - pred) ^2)
+}
+
+# The best model (lowest MSE) has 10 variables
+which.min(val.errors)
+coef(regfit.best, 10)
+
+# Capture previous steps in a function to be reused
+
+predict.regsubsets <- function (object, newdata, id, ...) {
+  form = as.formula(object$call [[2]])
+  mat = model.matrix(form, newdata)
+  coefi = coef(object, id=id)
+  xvars = names(coefi)
+  mat[, xvars] %*% coefi
+}
+  
+# Perform best subset selection on the full data set, and select the best ten-variable model 
+# Use full dataset to obtain more accurate coefficients
+regfit.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+
+# Choose among the models of different sizes using cross-validation. 
+# Perform best subset selection within each of the k training sets. 
+k = 10
+set.seed(1)
+# Allocate each observation to one of the folds
+folds = sample(1:k, nrow(Hitters), replace=TRUE)
+
+# Create matrix to store the results
+cv.errors = matrix(NA, k, 19, dimnames = list(NULL, paste(1:19)))
+
+for (j in 1:k) {
+  best.fit = regsubsets(Salary ~ ., data = Hitters[folds != j, ], nvmax = 19)
+  for (i in 1:19) {
+    pred = predict(best.fit, Hitters[folds==j,], id=i)
+    cv.errors[j,i] = mean((Hitters$Salary[folds == j] - pred) ^2)
+  }
+}
+
+# Average over the columns in order to obtain a vector for which 
+# the jth element is the cross-validation error for the j-variable model.
+mean.cv.errors = apply(cv.errors, 2, mean)
+mean.cv.errors
+par(mfrow=c(1,1))
+plot(mean.cv.errors, type="b")
+
+# Cross validation selects an 11-variable model
+# Perform best subset selection on the full data set in order to obtain the 11-variable model
+reg.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+coef(reg.best, 11)
