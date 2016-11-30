@@ -28,3 +28,6 @@ dist.matrix.input <- t(as.matrix(returns))
 # run clustering and plot results
 clust.complete <- hclust(dist(dist.matrix.input), method="complete")
 plot(clust.complete, main="Complete Linkage")
+
+# plot as a heatmap
+heatmap(t(as.matrix(returns)), Colv = NA)
