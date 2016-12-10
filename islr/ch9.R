@@ -2,6 +2,10 @@
 # 9.6 Lab: Support Vector Machines
 ###############################################################################
 
+###############################################################################
+# 9.6.1 Support Vector Classifier
+###############################################################################
+
 # Generate two-dimensional example data
 set.seed(1)
 x = matrix(rnorm(20*2), ncol = 2)
@@ -12,6 +16,8 @@ x[y==1,] = x[y==1,] + 1
 plot(x, col=(3-y))
 
 # Fit the SVM classifier. Encode the response as a factor, to enable classification
+# instead of regression
+# Create a data frame with the response coded as a factor
 dat  = data.frame(x = x, y = as.factor(y))
 library(e1071)
 svmfit = svm(y ~ ., data = dat, kernel = "linear", cost = 10, scale = FALSE)
@@ -26,11 +32,14 @@ summary(svmfit)
 # Fit using a smaller value of the cost parameter
 svmfit = svm(y ~ ., data = dat, kernel = "linear", cost = 0.1, scale = FALSE)
 plot(svmfit, dat)
+
+# A smaller cost parameter generates more support vectors
+svmfit$index
 summary(svmfit)
 
 # Use tune function to perform cross-validation
 set.seed(1)
-tune.out = tune(svm, y ~ ., data = dat, kernel = "linear",
+tune.out = tune(svm, y~., data = dat, kernel = "linear",
                 ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 100)))
 summary(tune.out)
 
@@ -48,27 +57,29 @@ testdat = data.frame(x = xtest, y = as.factor(ytest))
 ypred = predict(bestmod, testdat)
 table(predict = ypred, truth = testdat$y)
 
-# Repredict with different cost function
+# Repredict with different cost function. One additional observation is misclassified
 svmfit = svm(y ~ ., data = dat, kernel = "linear", cost = .01, scale = FALSE)
 ypred = predict(svmfit, testdat)
 table(predict = ypred, truth = testdat$y)
 
+# Consider situation where classes are linearly separable
 # Find a separating hyperplane using the SVM function. First
 # Futher separate the two classes so they are linearly separable
 x[y==1,] = x[y==1,] + 0.5
 plot(x, col = (y+5)/2, pch = 19)
 
 # Fit the classifer using large cost value to prevent mis-classifications
+# No training errors were made and only three support vectors were used
 dat = data.frame(x=x, y = as.factor(y))
 svmfit = svm(y ~ ., data = dat, kernel="linear", cost = 1e5)
 summary(svmfit)
 plot(svmfit, dat)
 
 # Use a smaller value of cost
+# One training observation is misclassified. But the margin is greater
 svmfit = svm(y ~ ., data = dat, kernel="linear", cost = 1)
 summary(svmfit)
 plot(svmfit, dat)
-
 
 ###############################################################################
 # 9.6.2 Support Vector Machine
