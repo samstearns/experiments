@@ -100,8 +100,8 @@ svmfit = svm(y ~ ., data = dat[train,], kernel = "radial", gamma = 1, cost = 1)
 plot(svmfit, dat[train,])
 summary(svmfit)
 
-# Increase cost to reduce training errors. But more irregular boundary may be at risk
-# of overfitting
+# Increase cost to reduce training errors. 
+# But more irregular boundary may be at risk of overfitting
 svmfit = svm(y ~ ., data = dat[train,], kernel = "radial", gamma = 1, cost = 1e5)
 plot(svmfit, dat[train,])
 
@@ -113,9 +113,12 @@ tune.out = tune(svm, y ~ .,
                 ranges = list(cost = c(0.1, 1, 10, 100, 1000),
                               gamma = c(0.5, 1, 2, 3, 4)))
 
+# Best performance involves cost = 1 and gamma = 2
 summary(tune.out)
 
 # Apply predictions using best parameters
+# Subset the data frame using -train as an index set
+# TODO: This does not work. Error in predict method
 table(true = dat[-train, "y"], pred = predict(tune.out$bestmodel, newdata = dat[-train,]))
 
 ###############################################################################
@@ -133,8 +136,23 @@ rocplot <- function(pred, truth, ...) {
 
 svmfit.opt = svm(y ~ ., data = dat[train,], kernel = "radial", gamma = 2, cost = 1, decision.values = T)
 predict(svmfit.opt, dat[train,])
+
 fitted = attributes(predict(svmfit.opt, dat[train,], decision.values = TRUE))$decision.values
 
+# Produce the ROC plot
+par(mfrow=c(1,2))
+rocplot(fitted, dat[train, "y"], main = "Training Data")
+
+# Increase gamma to produce more flexible fit and increase accuracy
+svmfit.flex = svm(y ~ ., data = dat[train,], kernel = "radial", gamma = 2, cost = 50, decision.values = T)
+fitted = attributes(predict(svmfit.flex, dat[train,], decision.values = TRUE))$decision.values
+rocplot(fitted, dat[train, "y"], add = T, col="red")
+
+# Compute ROC curves on the test data
+fitted = attributes(predict(svmfit.opt, dat[-train,], decision.values = T))$decision.values
+rocplot(fitted, dat[-train, "y"], main = "Test Data")
+fitted = attributes(predict(svmfit.flex, dat[-train,], decision.values = T))$decision.values
+rocplot(fitted, dat[-train, "y"], add = T, col="red")
 
 ###############################################################################
 # 9.6.4 SVM with Multiple Classes
