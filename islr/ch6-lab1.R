@@ -2,7 +2,7 @@
 # Lab 1 from Chapter 6 - Subset Selection Methods
 ###############################################################################
 
-#  Apply the best subset selection approach to the Hitters data. 
+# Apply the best subset selection approach to the Hitters data. 
 # We wish to predict a baseball player’s Salary on the basis of various statistics 
 # associated with performance in the previous year.
 library(ISLR)
@@ -13,7 +13,7 @@ names(Hitters)
 dim(Hitters)
 sum(is.na(Hitters$Salary))
 
-Hitters=na.omit(Hitters)
+Hitters = na.omit(Hitters)
 dim(Hitters)
 sum(is.na(Hitters$Salary))
 
@@ -35,9 +35,9 @@ names(reg.summary)
 reg.summary$rsq
 
 # Plot results to help determine which model to select
-par(mfrow=c(2,2))
+par(mfrow = c(2,2))
 plot(reg.summary$rss, xlab="Number of Variables", ylab="RSS", type="l")
-plot(reg.summary$adjr2,xlab="Number of Variables", ylab="Adjusted RSq", type="l")
+plot(reg.summary$adjr2, xlab="Number of Variables", ylab="Adjusted RSq", type="l")
 
 # Plot red dot to indicate model with largest adjusted R-Sq
 which.max(reg.summary$adjr2)
@@ -55,10 +55,10 @@ points(6, reg.summary$bic[6], col="red", cex=2, pch=20)
 # to display the selected variables for the best model with a given number 
 # of predictors, ranked according to the BIC, Cp, adjusted R2, or AIC
 # To find out more about this function, type ?plot.regsubsets.
-plot(regfit.full,scale="r2")
-plot(regfit.full,scale="adjr2")
-plot(regfit.full,scale="Cp")
-plot(regfit.full,scale="bic")
+plot(regfit.full, scale="r2")
+plot(regfit.full, scale="adjr2")
+plot(regfit.full, scale="Cp")
+plot(regfit.full, scale="bic")
 coef(regfit.full, 6)
 
 ###############################################################################
@@ -68,9 +68,9 @@ coef(regfit.full, 6)
 # Use the regsubsets() function to perform forward stepwise or backward stepwise 
 # selection, using the argument method="forward" or method="backward".
 
-regfit.fwd = regsubsets( Salary ~ ., data = Hitters, nvmax=19, method = "forward")
+regfit.fwd = regsubsets(Salary ~ ., data = Hitters, nvmax=19, method = "forward")
 summary(regfit.fwd)
-regfit.bwd = regsubsets( Salary ~ ., data = Hitters, nvmax=19, method = "backward")
+regfit.bwd = regsubsets(Salary ~ ., data = Hitters, nvmax=19, method = "backward")
 summary(regfit.bwd)
 
 ###############################################################################
@@ -80,14 +80,14 @@ summary(regfit.bwd)
 # Create training and test set
 set.seed (1)
 train = sample(c(TRUE,FALSE), nrow(Hitters), rep=TRUE)
-test =(!train)
+test = (!train)
 
 # Perform best subset selection on the training dataset
-regfit.best = regsubsets( Salary ~ ., data = Hitters[train,], nvmax=19)
+regfit.best = regsubsets(Salary ~ ., data = Hitters[train,], nvmax=19)
 
 # Compute the validation set error for the best model of each model size. 
 # First make a model matrix from the test data.
-test.mat = model.matrix(Salary ~ ., data=Hitters[test,])
+test.mat = model.matrix(Salary ~ ., data = Hitters[test,])
 
 val.errors = rep(NA, 19)
 for(i in 1:19) {
@@ -104,7 +104,6 @@ which.min(val.errors)
 coef(regfit.best, 10)
 
 # Capture previous steps in a function to be reused
-
 predict.regsubsets <- function (object, newdata, id, ...) {
   form = as.formula(object$call [[2]])
   mat = model.matrix(form, newdata)
@@ -122,7 +121,7 @@ regfit.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
 k = 10
 set.seed(1)
 # Allocate each observation to one of the folds
-folds = sample(1:k, nrow(Hitters), replace=TRUE)
+folds = sample(1:k, nrow(Hitters), replace = TRUE)
 
 # Create matrix to store the results
 cv.errors = matrix(NA, k, 19, dimnames = list(NULL, paste(1:19)))
