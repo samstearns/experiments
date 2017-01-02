@@ -132,5 +132,56 @@ lines(age.grid, predict(fit2, data.frame(age = age.grid)), col = "red", lwd = 2)
 legend("topright", legend = c("Span = 0.2", "Span = 0.8"), col = c("red", "blue"), lty = 1, lwd = 2, cex = 0.8)
 
 ###############################################################################
-# 7.8.1 GAMs
+# 7.8.3 GAMs
 ###############################################################################
+
+library(gam)
+
+# Fit a GAM to predict wage, using natural splines of year and age, with education as
+# a qualitative predictor. This can be modeled as a linear regression
+gam1 = lm(wage ~ ns(year, 4) + ns(age, 5) + education, data = Wage)
+
+# Fit the model using smoothing splines (vs. natural splines)
+gam.m3 = gam(wage ~ s(year,4) + s(age,5) + education, data = Wage)
+
+# Produce figure 7.12. Plot recognizes gam.m3 as a gam object, and plots accordingly
+par(mfrow = c(1,3))
+plot(gam.m3, se = TRUE, col = "blue")
+
+# the plot.gam function can still be used on the generic linear model
+plot.gam(gam1, se = TRUE, col = "red")
+
+# The function of year looks linear. Run anova tests to choose the best model
+# M2 is the best model based on the results of the anova tests
+gam.m1 = gam(wage ~ s(age, 5) + education, data = Wage)
+gam.m2 = gam(wage ~ year + s(age, 5) + education, data = Wage)
+
+summary(gam.m3)
+anova(gam.m1, gam.m2, gam.m3, test = "F")
+
+# Make predictions on the training set
+preds = predict(gam.m2, newdata = Wage)
+
+# Use local regression fits as a building block
+gam.lo = gam(wage ~ s(year, df = 4) + lo(age, span = 0.7) + education, data = Wage)
+plot.gam(gam.lo, se = TRUE, col = "green")
+
+# Use lo() to create interactions before calling the gam() function
+gam.lo.i = gam(wage ~ lo(year, age, span = 0.5) + education, data = Wage)
+
+# plot resulting 2D surface using the akima package
+library(akima)
+plot(gam.lo.i)
+
+# Fit a logistic regresion GAM using the I() function to create the binary response
+gam.lr = gam(I(wage > 250) ~ year + s(age, df = 5) + education, family = binomial, data = Wage)
+par(mfrow = c(1,3))
+plot(gam.lr, se = T, col = "green")
+
+# Check # of high earners by education
+table(education, I(wage>250))
+
+# Fit logistic regression excluding the <HS category. These results are more sensible 
+# (particularly the chart on the left)
+gam.lr.s = gam(I(wage > 250) ~ year + s(age, df = 5) + education, family = binomial, data = Wage, subset = (education != "1. < HS Grad"))
+plot(gam.lr.s, se = T, col = "green")
