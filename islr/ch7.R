@@ -87,6 +87,50 @@ coef(summary(fit))
 # 7.8.2 Splines
 ###############################################################################
 
+library(splines)
+
+# Fit age to wage using a regression spine. Three knots produce spline with
+# Six basis funcitons
+fit = lm(wage ~ bs(age, knots = c(25, 40, 60)), data = Wage)
+pred = predict(fit, newdata = list(age = age.grid), se = T)
+plot(age, wage, col = "gray")
+lines(age.grid, pred$fit, lwd = 2)
+lines(age.grid, pred$fit + 2 * pred$se, lty = "dashed")
+lines(age.grid, pred$fit - 2 * pred$se, lty = "dashed")
+
+# Use df option to produce spline with knots at uniform quantiles of data
+dim(bs(age, knots = c(25, 40, 60)))
+dim(bs(age, df = 6))
+# Knots correspond to 25, 50, and 75th percentile of age
+attr(bs(age, df = 6), "knots")
+
+# Use the ns() function to fit a natural spline.
+fit2 = lm(wage ~ ns(age, df = 4), data = Wage)
+pred2  = predict(fit2, newdata = list(age = age.grid), se = T)
+lines(age.grid, pred2$fit, col = "red", lwd = 2)
+
+# Fit a smoothing spline using smooth.spline(). Figure 7.8
+plot(age, wage, xlim = agelims, cex = 0.5, col = "darkgrey")
+title("Smoothing Spline")
+# Specify degrees of freedom
+fit = smooth.spline(age, wage, df = 16)
+# Select smoothness via cross-validation. This yields 6.8 degrees of freedom
+fit2 = smooth.spline(age, wage, cv = TRUE)
+fit2$df
+lines(fit, col = "red", lwd = 2)
+lines(fit2, col = "blue", lwd = 2)
+legend("topright", legend = c("16 DF", "6.8 DF"), col = c("red", "blue"), lty = 1, lwd = 2, cex = 0.8)
+
+# Use loess() function to perform local regression
+plot(age, wage, xlim = agelims, cex = 0.5, col = "darkgrey")
+title("Local Regression")
+fit = loess(wage ~ age, span = 0.2, data = Wage)
+fit2 = loess(wage ~ age, span = 0.5, data = Wage)
+
+lines(age.grid, predict(fit, data.frame(age = age.grid)), col = "red", lwd = 2)
+lines(age.grid, predict(fit2, data.frame(age = age.grid)), col = "red", lwd = 2)
+legend("topright", legend = c("Span = 0.2", "Span = 0.8"), col = c("red", "blue"), lty = 1, lwd = 2, cex = 0.8)
+
 ###############################################################################
 # 7.8.1 GAMs
 ###############################################################################
