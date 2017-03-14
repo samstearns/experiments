@@ -22,7 +22,7 @@ summary(prior.cost.prospective.fit)
 prior.cost.prospective.2.fit <- lm(allow_future_total ~ allow_current_total + non_claimant, data = data)
 summary(prior.cost.prospective.2.fit)
 
-# Simple Age/Gender + HCCs. 
+# Simple Age/Gender + HCCs
 hcc.current.data <- duncan.data[, c(2, 21, 26, 51:133)]
 hcc.concurrent.fit <- lm(allow_current_total ~ ., data = hcc.current.data)
 summary(hcc.concurrent.fit)
@@ -35,16 +35,15 @@ hcc.prospective.admit.data <- duncan.data[, c(2, 21, 35, 51:133)]
 hcc.prospective.admit.fit <- lm(admit_cnt_future ~ ., data = hcc.prospective.admit.data)
 summary(hcc.prospective.admit.fit)
 
-
 hcc.prior.cost.data <- duncan.data[, c(2, 21, 26, 32, 51:133)]
 hcc.prior.cost.fit <- lm(allow_future_total ~ ., data = hcc.prior.cost.data)
 summary(hcc.prior.cost.fit)
 
 # 10.3: Example of Logistic Regression to predict likelihood of hospitalization ---------------
-admission.table <- table(data$admit_flg_future, data$admit_flg_current)
+admission.table <- table(duncan.data$admit_flg_future, duncan.data$admit_flg_current)
 admission.table
 
 attach(data)
 
-loh.fit = glm(admit_flg_future ~ admit_flg_current + gender + A_OVER64 + Er_visit_flg_current + pcp_visit_cnt_current, data=data, family=binomial)
+loh.fit = glm(admit_flg_future ~ admit_flg_current + gender + A_OVER64 + Er_visit_flg_current + pcp_visit_cnt_current, data=duncan.data, family=binomial)
 summary(loh.fit)
