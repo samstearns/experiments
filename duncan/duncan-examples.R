@@ -6,7 +6,7 @@
 ###############################################################################################
 
 # Data Setup ----------------------------------------------------------------------------------
-setwd("/Users/sjs/Dropbox/dev/git/experiments/duncan")
+setwd("/Users/sjs/dev/git/experiments/duncan")
 duncan.data <- read.csv("modeling_sample_dataset.csv")
 summary(duncan.data)
 
