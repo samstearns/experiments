@@ -13,13 +13,13 @@ summary(duncan.data)
 # 8.7: Example of linear regressions ----------------------------------------------------------
 hist(allow_future_total)
 
-age.gender.prospective.fit <- lm(allow_future_total ~ gender + age, data = data)
+age.gender.prospective.fit <- lm(allow_future_total ~ gender + age, data = duncan.data)
 summary(age.gender.prospective.fit)
 
-prior.cost.prospective.fit <- lm(allow_future_total ~ allow_current_total, data = data)
+prior.cost.prospective.fit <- lm(allow_future_total ~ allow_current_total, data = duncan.data)
 summary(prior.cost.prospective.fit)
 
-prior.cost.prospective.2.fit <- lm(allow_future_total ~ allow_current_total + non_claimant, data = data)
+prior.cost.prospective.2.fit <- lm(allow_future_total ~ allow_current_total + non_claimant, data = duncan.data)
 summary(prior.cost.prospective.2.fit)
 
 # Simple Age/Gender + HCCs
@@ -43,7 +43,7 @@ summary(hcc.prior.cost.fit)
 admission.table <- table(duncan.data$admit_flg_future, duncan.data$admit_flg_current)
 admission.table
 
-attach(data)
+attach(duncan.data)
 
 loh.fit = glm(admit_flg_future ~ admit_flg_current + gender + A_OVER64 + Er_visit_flg_current + pcp_visit_cnt_current, data=duncan.data, family=binomial)
 summary(loh.fit)
