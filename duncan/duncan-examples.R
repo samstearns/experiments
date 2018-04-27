@@ -6,14 +6,13 @@
 ###############################################################################################
 
 # Data Setup ----------------------------------------------------------------------------------
-duncan.data <- read.csv("modeling_sample_dataset.csv")
+duncan_data <- read.csv("modeling_sample_dataset.csv")
 attach(duncan.data)
 summary(duncan.data)
 
 ###############################################################################################
 # Chapter 8: Linear Regression Models
 ###############################################################################################
-
 
 # 8.7: Example of linear regressions ----------------------------------------------------------
 hist(allow_future_total)
@@ -27,43 +26,38 @@ hist(allow_future_total)
 ###############################################################################################
 
 # 10.3: Example of Logistic Regression to predict likelihood of hospitalization ---------------
-admission.table <- table(duncan.data$admit_flg_future, duncan.data$admit_flg_current)
-admission.table
+admission_table <- table(duncan_data$admit_flg_future, duncan_data$admit_flg_current)
+admission_table
 
-loh.fit = glm(admit_flg_future ~ admit_flg_current + gender + A_OVER64 + Er_visit_flg_current + pcp_visit_cnt_current, data=duncan.data, family=binomial)
-summary(loh.fit)
+loh_fit = glm(admit_flg_future ~ admit_flg_current + gender + A_OVER64 + Er_visit_flg_current + pcp_visit_cnt_current, data=duncan_data, family=binomial)
+summary(loh_fit)
 
 ###############################################################################################
 # Chapter 11: Tree-Based Methods
 ###############################################################################################
-hcc.prospective.data <- duncan.data[, c(2, 21, 32, 51:133)]
-hcc.prospective.fit <- lm(allow_future_total ~ ., data = hcc.prospective.data)
-summary(hcc.prospective.fit)
+hcc_prospective_data <- duncan_data[, c(2, 21, 32, 51:133)]
+hcc_prospective_fit <- lm(allow_future_total ~ ., data = hcc_prospective_data)
+summary(hcc_prospective_fit)
 
-hcc.prospective.admit.data <- duncan.data[, c(2, 21, 35, 51:133)]
-hcc.prospective.admit.fit <- lm(admit_cnt_future ~ ., data = hcc.prospective.admit.data)
-summary(hcc.prospective.admit.fit)
+hcc_prospective_admit_data <- duncan_data[, c(2, 21, 35, 51:133)]
+hcc_prospective_admit_fit <- lm(admit_cnt_future ~ ., data = hcc_prospective_admit_data)
+summary(hcc_prospective_admit_fit)
 
-hcc.prior.cost.data <- duncan.data[, c(2, 21, 26, 32, 51:133)]
-hcc.prior.cost.fit <- lm(allow_future_total ~ ., data = hcc.prior.cost.data)
+hcc_prior_cost_data <- duncan_data[, c(2, 21, 26, 32, 51:133)]
+hcc_prior_cost_fit <- lm(allow_future_total ~ ., data = hcc_prior_cost_data)
+summary(hcc_prior_cost_fit)
 
 # Regression trees to predict prospective cost
 library(MASS)
 library(tree)
 
 set.seed(1)
-train = sample(1:nrow(hcc.prospective.data), nrow(hcc.prospective.data)/2)
-tree.prospective = tree(allow_future_total ~., hcc.prospective.data, subset=train)
-summary(tree.prospective)
+train = sample(1:nrow(hcc_prospective_data), nrow(hcc_prospective_data)/2)
+tree_prospective = tree(allow_future_total ~., hcc_prospective_data, subset=train)
+summary(tree_prospective)
 
 # Use unpruned tree to make predictions on the test set
-yhat = predict(tree.prospective, newdata = hcc.prospective.data[-train ,])
-hcc.prospective.costs = hcc.prospective.data[-train ,"allowed_future_cost"]
-plot(yhat, boston.test)
+yhat = predict(tree_prospective, newdata = hcc_prospective_data[-train ,])
+hcc_prospective_costs = hcc_prospective_data[-train ,"allowed_future_cost"]
+plot(yhat, hcc_prospective_costs)
 abline(0,1)
-
-# Test set MSE associated with the regression tree is 25.05. 
-# The square root of the MSE is therefore around 5.005, 
-# indicating that this model leads to test predictions that 
-# are within around $5,005 of the true median home value for the suburb.
-mean((yhat-hcc.prospective.costs)^2)
