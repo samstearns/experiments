@@ -6,22 +6,46 @@
 ###############################################################################################
 
 # Data Setup ----------------------------------------------------------------------------------
-setwd("/Users/sjs/dev/git/experiments/duncan")
 duncan.data <- read.csv("modeling_sample_dataset.csv")
+attach(duncan.data)
 summary(duncan.data)
+
+###############################################################################################
+# Chapter 8: Linear Regression Models
+###############################################################################################
+
 
 # 8.7: Example of linear regressions ----------------------------------------------------------
 hist(allow_future_total)
+
+###############################################################################################
+# Chapter 9: The Generalized Linear Model
+###############################################################################################
+
+###############################################################################################
+# Chapter 10: Logistic Regression Models
+###############################################################################################
 
 # 10.3: Example of Logistic Regression to predict likelihood of hospitalization ---------------
 admission.table <- table(duncan.data$admit_flg_future, duncan.data$admit_flg_current)
 admission.table
 
-attach(duncan.data)
-
 loh.fit = glm(admit_flg_future ~ admit_flg_current + gender + A_OVER64 + Er_visit_flg_current + pcp_visit_cnt_current, data=duncan.data, family=binomial)
 summary(loh.fit)
 
+###############################################################################################
+# Chapter 11: Tree-Based Methods
+###############################################################################################
+hcc.prospective.data <- duncan.data[, c(2, 21, 32, 51:133)]
+hcc.prospective.fit <- lm(allow_future_total ~ ., data = hcc.prospective.data)
+summary(hcc.prospective.fit)
+
+hcc.prospective.admit.data <- duncan.data[, c(2, 21, 35, 51:133)]
+hcc.prospective.admit.fit <- lm(admit_cnt_future ~ ., data = hcc.prospective.admit.data)
+summary(hcc.prospective.admit.fit)
+
+hcc.prior.cost.data <- duncan.data[, c(2, 21, 26, 32, 51:133)]
+hcc.prior.cost.fit <- lm(allow_future_total ~ ., data = hcc.prior.cost.data)
 
 # Regression trees to predict prospective cost
 library(MASS)
