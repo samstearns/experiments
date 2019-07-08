@@ -5,13 +5,13 @@ library(ggplot2)
 
 # Load a sample data file on MSSP ACOs
 # Downloaded from: https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/SSPACO/Overview.html
-setwd("/Users/sjs/Dropbox/dev/git/experiments/turnipgraphs/")
-aco <-read.csv("./Final.ACO.SSP.PUF.Y2013.csv")
+library(mssp)
+aco <- load_puf_file(2013)
 
 # This function sets up turnip charts with standard formatting. Following links have references
 # http://stackoverflow.com/questions/5106782/use-of-ggplot-within-another-function-in-r
 # http://stackoverflow.com/questions/15458526/r-pass-variable-column-indices-to-ggplot2
-drawTurnipGraph <- function(input.data,  y_string, title, y_axis_title) {
+draw_turnip_graph <- function(input.data,  y_string, title, y_axis_title) {
   ggplot(input.data, aes_string(x = "1", y = y_string)) +
     geom_dotplot(binaxis = "y", stackdir = "center", dotsize=0.75) + 
     ggtitle(title) + 
@@ -21,5 +21,5 @@ drawTurnipGraph <- function(input.data,  y_string, title, y_axis_title) {
 }
 
 # Example outputs
-drawTurnipGraph(aco, "P_SNF_ADM", "SNF Utilization by ACO, \n2013 Performance Year", "Rate per 1,000")
-drawTurnipGraph(aco, "ADM_S_Trm", "Short Term Inpatient Utilization by ACO, \n2013 Performance Year", "Rate per 1,000")
+draw_turnip_graph(aco, "P_SNF_ADM", "SNF Utilization by ACO, \n2013 Performance Year", "Rate per 1,000")
+draw_turnip_graph(aco, "ADM_S_Trm", "Short Term Inpatient Utilization by ACO, \n2013 Performance Year", "Rate per 1,000")
