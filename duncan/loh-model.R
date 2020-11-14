@@ -10,7 +10,6 @@ library(tree)
 library(ROCR)
 
 # Data Setup ----------------------------------------------------------------------------------
-setwd("/Users/sjs/dev/git/experiments/duncan")
 duncan.data <- read.csv("modeling_sample_dataset.csv")
 summary(duncan.data)
 
