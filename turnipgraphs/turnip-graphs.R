@@ -3,8 +3,7 @@
 # More information is available: http://docs.ggplot2.org/0.9.3/geom_dotplot.html
 library(ggplot2)
 
-# Load a sample data file on MSSP ACOs
-# Downloaded from: https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/SSPACO/Overview.html
+# Load a sample data file on MSSP ACOs using the MSSP library
 library(mssp)
 aco <- load_puf_file(2013)
 
